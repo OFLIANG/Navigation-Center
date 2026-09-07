@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title data-i18n="pageTitle">Navigation Center</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-start: #0a0e1a;
+            --bg-end: #0f1629;
+            --card-bg: rgba(20, 28, 50, 0.6);
+            --card-solid: rgba(18, 26, 46, 0.85);
+            --border: rgba(0, 212, 255, 0.2);
+            --accent: #00d4ff;
+            --accent-2: #0099ff;
+            --text: #e8f0ff;
+            --text-dim: #8a9bb8;
+        }
+
+        html, body {
+            min-height: 100vh;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+            background: radial-gradient(ellipse at top, var(--bg-end) 0%, var(--bg-start) 100%);
+            color: var(--text);
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(0, 212, 255, 0.04) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 212, 255, 0.04) 1px, transparent 1px);
+            background-size: 40px 40px;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .glow {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(100px);
+            opacity: 0.4;
+            pointer-events: none;
+            z-index: 0;
+        }
+        .glow-1 {
+            width: 400px;
+            height: 400px;
+            background: var(--accent);
+            top: -100px;
+            left: -100px;
+            animation: float1 8s ease-in-out infinite;
+        }
+        .glow-2 {
+            width: 350px;
+            height: 350px;
+            background: var(--accent-2);
+            bottom: -100px;
+            right: -100px;
+            animation: float2 10s ease-in-out infinite;
+        }
+
+        @keyframes float1 {
+            0%, 100% { transform: translate(0, 0); }
+            50% { transform: translate(50px, 80px); }
+        }
+        @keyframes float2 {
+            0%, 100% { transform: translate(0, 0); }
+            50% { transform: translate(-60px, -50px); }
+        }
+
+        /* 语言切换 */
+        .lang-switcher {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 10;
+            display: flex;
+            background: var(--card-solid);
+            border: 1px solid var(--border);
+            border-radius: 30px;
+            padding: 4px;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+        .lang-btn {
+            padding: 6px 14px;
+            border: none;
+            background: transparent;
+            color: var(--text-dim);
+            font-size: 0.85rem;
+            font-weight: 500;
+            border-radius: 24px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: inherit;
+        }
+        .lang-btn.active {
+            background: linear-gradient(135deg, var(--accent-2), var(--accent));
+            color: var(--bg-start);
+            box-shadow: 0 4px 12px rgba(0, 212, 255, 0.3);
+        }
+
+        .container {
+            position: relative;
+            z-index: 1;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        .title {
+            font-size: clamp(1.8rem, 5vw, 2.8rem);
+            font-weight: 700;
+            letter-spacing: 2px;
+            background: linear-gradient(135deg, var(--accent) 0%, #667eea 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: var(--text-dim);
+            font-size: clamp(0.85rem, 2vw, 1rem);
+            letter-spacing: 1px;
+        }
+
+        .cards {
+            display: flex;
+            gap: 30px;
+            flex-wrap: wrap;
+            justify-content: center;
+            width: 100%;
+            max-width: 900px;
+        }
+
+        .card {
+            flex: 1 1 340px;
+            max-width: 420px;
+            min-height: 320px;
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 40px 30px;
+            text-decoration: none;
+            color: inherit;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--accent), transparent);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-8px);
+            border-color: rgba(0, 212, 255, 0.5);
+            box-shadow: 0 20px 60px rgba(0, 212, 255, 0.15);
+        }
+
+        .card:hover::before {
+            opacity: 1;
+        }
+
+        .icon {
+            width: 72px;
+            height: 72px;
+            border-radius: 18px;
+            background: linear-gradient(135deg, var(--accent-2), var(--accent));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 24px;
+            box-shadow: 0 8px 24px rgba(0, 212, 255, 0.3);
+        }
+
+        .icon svg {
+            width: 36px;
+            height: 36px;
+            fill: #fff;
+        }
+
+        .card-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: var(--text);
+        }
+
+        .card-desc {
+            color: var(--text-dim);
+            font-size: 0.95rem;
+            line-height: 1.6;
+            margin-bottom: 28px;
+            flex: 1;
+        }
+
+        .card-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 10px 22px;
+            background: rgba(0, 212, 255, 0.1);
+            border: 1px solid rgba(0, 212, 255, 0.3);
+            border-radius: 30px;
+            color: var(--accent);
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .card:hover .card-link {
+            background: var(--accent);
+            color: var(--bg-start);
+            box-shadow: 0 6px 20px rgba(0, 212, 255, 0.4);
+        }
+
+        .card-link svg {
+            width: 16px;
+            height: 16px;
+            transition: transform 0.3s ease;
+        }
+
+        .card:hover .card-link svg {
+            transform: translateX(4px);
+        }
+
+        .footer {
+            margin-top: 60px;
+            color: var(--text-dim);
+            font-size: 0.8rem;
+            text-align: center;
+        }
+
+        @media (max-width: 768px) {
+            .cards {
+                flex-direction: column;
+                align-items: center;
+                gap: 20px;
+            }
+            .card {
+                width: 100%;
+                max-width: 400px;
+                min-height: auto;
+                padding: 32px 24px;
+            }
+            .header {
+                margin-bottom: 35px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="glow glow-1"></div>
+    <div class="glow glow-2"></div>
+
+    <div class="lang-switcher">
+        <button class="lang-btn active" data-lang="en">EN</button>
+        <button class="lang-btn" data-lang="zh">中文</button>
+    </div>
+
+    <div class="container">
+        <div class="header">
+            <h1 class="title" data-i18n="title">Navigation Center</h1>
+            <p class="subtitle" data-i18n="subtitle">Quick Access</p>
+        </div>
+
+        <div class="cards">
+            <a href="https://xiaozhi.me" class="card" target="_blank" rel="noopener noreferrer">
+                <div class="icon">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm0 4a2 2 0 1 1-2 2 2 2 0 0 1 2-2zm0 14a8 8 0 0 1-6.58-3.51C5.67 14.34 7.48 13 9.5 13h5c2.02 0 3.83 1.34 4.08 3.49A8 8 0 0 1 12 20z"/>
+                    </svg>
+                </div>
+                <h2 class="card-title" data-i18n="card1Title">Xiaozhi Console</h2>
+                <p class="card-desc" data-i18n="card1Desc">Xiaozhi AI assistant console, manage your smart devices and conversations.</p>
+                <span class="card-link">
+                    <span data-i18n="card1Link">Enter Console</span>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M5 12h14M12 5l7 7-7 7"/>
+                    </svg>
+                </span>
+            </a>
+
+            <a href="https://IDCard.LeongBro.top" class="card" target="_blank" rel="noopener noreferrer">
+                <div class="icon">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M20 4H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2zm-1 11h-5v-2h5zm0-4h-5V9h5zm-7-4h9v2h-9zM7 8a3 3 0 1 1-3 3 3 3 0 0 1 3-3zm0 8.2c-2.5 0-4 1.3-4 2.8V18h8v-1c0-1.5-1.5-2.8-4-2.8z"/>
+                    </svg>
+                </div>
+                <h2 class="card-title" data-i18n="card2Title">LeongBro</h2>
+                <p class="card-desc" data-i18n="card2Desc">Personal information and business card page, view contact details and profile.</p>
+                <span class="card-link">
+                    <span data-i18n="card2Link">View Info</span>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M5 12h14M12 5l7 7-7 7"/>
+                    </svg>
+                </span>
+            </a>
+        </div>
+
+        <div class="footer">
+            <span data-i18n="footer">© 2026 Navigation Center</span>
+        </div>
+    </div>
+
+    <script>
+        const i18n = {
+            en: {
+                pageTitle: "Navigation Center",
+                title: "Navigation Center",
+                subtitle: "Quick Access",
+                card1Title: "Xiaozhi Console",
+                card1Desc: "Xiaozhi AI assistant console, manage your smart devices and conversations.",
+                card1Link: "Enter Console",
+                card2Title: "LeongBro",
+                card2Desc: "Personal information and business card page, view contact details and profile.",
+                card2Link: "View Info",
+                footer: "© 2026 Navigation Center"
+            },
+            zh: {
+                pageTitle: "导航中心",
+                title: "导航中心",
+                subtitle: "快速入口",
+                card1Title: "小智控制台",
+                card1Desc: "小智 AI 智能助手控制台，管理你的智能设备与对话。",
+                card1Link: "进入控制台",
+                card2Title: "梁超",
+                card2Desc: "个人信息与名片展示页面，查看联系方式与个人资料。",
+                card2Link: "查看信息",
+                footer: "© 2026 Navigation Center"
+            }
+        };
+
+        let currentLang = localStorage.getItem('nav_lang') || 'en';
+
+        function setLang(lang) {
+            currentLang = lang;
+            localStorage.setItem('nav_lang', lang);
+            document.documentElement.lang = lang === 'zh' ? 'zh-CN' : 'en';
+            updateLangUI();
+        }
+
+        function updateLangUI() {
+            const dict = i18n[currentLang];
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (dict[key] !== undefined) {
+                    if (el.tagName === 'TITLE') {
+                        document.title = dict[key];
+                    } else {
+                        el.textContent = dict[key];
+                    }
+                }
+            });
+            document.querySelectorAll('.lang-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.lang === currentLang);
+            });
+        }
+
+        document.querySelectorAll('.lang-btn').forEach(btn => {
+            btn.addEventListener('click', () => setLang(btn.dataset.lang));
+        });
+
+        setLang(currentLang);
+    </script>
+</body>
+</html>
